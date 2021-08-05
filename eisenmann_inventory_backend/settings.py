@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'product.apps.ProductConfig',
     'service.apps.ServiceConfig',
     'client.apps.ClientConfig',
+    'employee.apps.EmployeeConfig',
     'rest_framework',
     'corsheaders'
 ]

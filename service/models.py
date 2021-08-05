@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+from employee.models import Employee
 from django.db import models
 from django.utils import timezone
 
@@ -9,7 +11,6 @@ from product.models import Product
 # Este modelo guarda el Servicio.
 class Service(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True)
-    # user = models.ForeignKey("Usuario", on_delete=models.SET_NULL, null=True, blank=True)
     code = models.CharField(max_length=8, null=True, blank=True)
     estimated_price = models.CharField(max_length=128, null=True, blank=True)
     init_date = models.DateField(null=True, blank=True)
@@ -31,7 +32,7 @@ class Service(models.Model):
     @property
     def final_price(self):
         service_products = self.service_products.all()
-        total = sum([item.total for item in service_products])
+        total = sum([item.total_cost for item in service_products])
         return total
 
 
@@ -60,13 +61,19 @@ class ServicioDetalleSubservicio(models.Model):
 class ServiceProductDetail(models.Model):
     service = models.ForeignKey(Service, related_name='service_products', on_delete=models.CASCADE, null=True, blank=True)
     product = models.ForeignKey(Product,  on_delete=models.CASCADE, null=True, blank=True)
+    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)
+    total_cost = models.FloatField(default=0.0, null=True, blank=True)
 
     def __str__(self):
         return self.description
 
-    @property
-    def total(self):
-        total = self.product.unit_price * self.quantity
-        return total
+    def clean(self):
+        if not self.product.sub_product.exists():
+            raise ValidationError('This product has not entries.')
+
+    def save(self, *args, **kwargs):
+        self.total_cost = self.quantity * self.product.current_price
+        return super(ServiceProductDetail, self).save(*args, **kwargs)
+

@@ -54,8 +54,8 @@ class DetailService(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        product = self.get_object(pk)
-        product.delete()
+        service = self.get_object(pk)
+        service.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -106,7 +106,9 @@ class DetailServiceProduct(APIView):
         service_product = self.get_object(pk)
         if service_product.service.state is False:
             product = service_product.product
-            product.stock += service_product.quantity
-            product.save()
+            sub_product = product.sub_product.latest('created_at')
+            sub_product.stock += service_product.quantity
+            sub_product.save()
+
         service_product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
