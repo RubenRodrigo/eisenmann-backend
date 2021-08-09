@@ -10,7 +10,8 @@ from product.models import Product
 
 # Este modelo guarda el Servicio.
 class Service(models.Model):
-    client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, blank=True)
+    client = models.ForeignKey(
+        Client, on_delete=models.SET_NULL, null=True, blank=True)
     code = models.CharField(max_length=8, null=True, blank=True)
     estimated_price = models.CharField(max_length=128, null=True, blank=True)
     init_date = models.DateField(null=True, blank=True)
@@ -59,9 +60,12 @@ class ServicioDetalleSubservicio(models.Model):
 
 # Este modelo guarda los productos que se guardan en un servicio
 class ServiceProductDetail(models.Model):
-    service = models.ForeignKey(Service, related_name='service_products', on_delete=models.CASCADE, null=True, blank=True)
-    product = models.ForeignKey(Product,  on_delete=models.CASCADE, null=True, blank=True)
-    employee = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True)
+    service = models.ForeignKey(
+        Service, related_name='service_products', on_delete=models.CASCADE, null=True, blank=True)
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, null=True, blank=True)
+    employee = models.ForeignKey(
+        Employee, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)
     total_cost = models.FloatField(default=0.0, null=True, blank=True)
@@ -70,10 +74,9 @@ class ServiceProductDetail(models.Model):
         return self.description
 
     def clean(self):
-        if not self.product.sub_product.exists():
+        if not self.product.product_entry.exists():
             raise ValidationError('This product has not entries.')
 
     def save(self, *args, **kwargs):
         self.total_cost = self.quantity * self.product.current_price
         return super(ServiceProductDetail, self).save(*args, **kwargs)
-

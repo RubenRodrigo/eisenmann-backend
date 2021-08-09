@@ -44,7 +44,7 @@ class DetailService(APIView):
         service = self.get_object(pk=pk)
         serializer = ServiceSerializer(service)
         return Response(serializer.data)
-    
+
     def put(self, request, pk, format=None):
         service = self.get_object(pk)
         serializer = ServiceSerializer(service, data=request.data)
@@ -96,7 +96,8 @@ class DetailServiceProduct(APIView):
 
     def put(self, request, pk, format=None):
         service_product = self.get_object(pk)
-        serializer = ServiceProductSerializer(service_product, data=request.data)
+        serializer = ServiceProductSerializer(
+            service_product, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -106,9 +107,9 @@ class DetailServiceProduct(APIView):
         service_product = self.get_object(pk)
         if service_product.service.state is False:
             product = service_product.product
-            sub_product = product.sub_product.latest('created_at')
-            sub_product.stock += service_product.quantity
-            sub_product.save()
+            product_entry = product.product_entry.latest('created_at')
+            product_entry.stock += service_product.quantity
+            product_entry.save()
 
         service_product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

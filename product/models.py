@@ -24,8 +24,10 @@ class Unit(models.Model):
 
 # Modelo general del producto
 class Product(models.Model):
-    type = models.ForeignKey(Type, on_delete=models.SET_NULL, null=True, blank=True)
-    unit = models.ForeignKey(Unit, on_delete=models.SET_NULL, null=True, blank=True)
+    type = models.ForeignKey(
+        Type, on_delete=models.SET_NULL, null=True, blank=True)
+    unit = models.ForeignKey(
+        Unit, on_delete=models.SET_NULL, null=True, blank=True)
     code = models.CharField(max_length=12, null=True, blank=True)
     name = models.CharField(max_length=128, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
@@ -37,26 +39,30 @@ class Product(models.Model):
 
     @property
     def total_stock(self):
-        sub_products = self.sub_product.all()
-        total = sum([item.stock for item in sub_products])
+        product_entries = self.product_entry.all()
+        total = sum([item.stock for item in product_entries])
         return total
 
     @property
     def current_price(self):
-        sub_product = self.sub_product.latest('created_at')
-        return sub_product.unit_price
+        product_entry = self.product_entry.latest('created_at')
+        return product_entry.unit_price
 
 
 # Modelo general del producto
-class SubProduct(models.Model):
-    product = models.ForeignKey(Product, related_name='sub_product', on_delete=models.SET_NULL, null=True, blank=True)
+class ProductEntry(models.Model):
+    product = models.ForeignKey(
+        Product, related_name='product_entry', on_delete=models.SET_NULL, null=True, blank=True)
+    init_stock = models.IntegerField(default=0, null=True, blank=True)
     stock = models.IntegerField(default=0, null=True, blank=True)
-    real = models.IntegerField(default=0, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     unit_price = models.FloatField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return self.created_at.strftime('%m/%d/%Y, %H:%M:%S')
 
+    @property
+    def total_cost(self):
+        return self.unit_price * self.init_stock

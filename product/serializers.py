@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from product.models import Product, SubProduct, Type, Unit
+from product.models import Product, ProductEntry, Type, Unit
 
 
 class TypeSerializer(serializers.ModelSerializer):
@@ -17,19 +17,19 @@ class UnitSerializer(serializers.ModelSerializer):
         fields = ['id',  'name', 'description', 'abr']
 
 
-class SubProductSerializer(serializers.ModelSerializer):
+class ProductEntrySerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = SubProduct
-        fields = ['id', 'product', 'stock', 'real', 'description',
-                  'unit_price', 'created_at', 'updated_at']
+        model = ProductEntry
+        fields = ['id', 'product', 'init_stock', 'stock', 'description',
+                  'unit_price', 'created_at', 'updated_at', 'total_cost']
 
 
 class ProductSerializer(serializers.ModelSerializer):
 
     type_detail = TypeSerializer(source='type', read_only=True)
     unit_detail = UnitSerializer(source='unit', read_only=True)
-    sub_product = SubProductSerializer(many=True, read_only=True)
+    product_entry = ProductEntrySerializer(many=True, read_only=True)
 
     # def update(self, instance, validated_data):
     #     instance.type = validated_data.get('type', instance.type)
@@ -64,7 +64,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'current_price',
 
             # Nested Fields
-            'sub_product',
+            'product_entry',
             'type_detail',
             'unit_detail'
         ]

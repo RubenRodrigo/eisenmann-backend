@@ -6,8 +6,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from product.models import Product, SubProduct, Type, Unit
-from product.serializers import ProductSerializer, SubProductSerializer, TypeSerializer, UnitSerializer
+from product.models import Product, ProductEntry, Type, Unit
+from product.serializers import ProductSerializer, ProductEntrySerializer, TypeSerializer, UnitSerializer
 
 
 class ListProducts(APIView):
@@ -59,52 +59,52 @@ class DetailProduct(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ListSubProducts(APIView):
+class ListProductEntries(APIView):
     """
-    list all sub_products, or create a new sub_product.
+    list all product_entries, or create a new product_entry.
     """
 
     def get(self, request):
-        sub_products = SubProduct.objects.all().order_by('-created_at')
-        serializer = SubProductSerializer(sub_products, many=True)
+        product_entries = ProductEntry.objects.all().order_by('-created_at')
+        serializer = ProductEntrySerializer(product_entries, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        serializer = SubProductSerializer(data=request.data)
+        serializer = ProductEntrySerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DetailSubProduct(APIView):
+class DetailProductEntry(APIView):
     """
-    detail of one sub_product, or create a new sub_product.
+    detail of one product_entry.
     """
 
     @staticmethod
     def get_object(pk):
         try:
-            return SubProduct.objects.get(pk=pk)
-        except SubProduct.DoesNotExist:
+            return ProductEntry.objects.get(pk=pk)
+        except ProductEntry.DoesNotExist:
             raise Http404
 
     def get(self, request, pk, format=None):
-        sub_product = self.get_object(pk=pk)
-        serializer = SubProductSerializer(sub_product)
+        product_entry = self.get_object(pk=pk)
+        serializer = ProductEntrySerializer(product_entry)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
-        sub_product = self.get_object(pk)
-        serializer = SubProductSerializer(sub_product, data=request.data)
+        product_entry = self.get_object(pk)
+        serializer = ProductEntrySerializer(product_entry, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
-        sub_product = self.get_object(pk)
-        sub_product.delete()
+        product_entry = self.get_object(pk)
+        product_entry.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
