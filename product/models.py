@@ -49,7 +49,7 @@ class Product(models.Model):
         return product_entry.unit_price
 
 
-# Modelo general del producto
+# Modelo general de entrada de producto
 class ProductEntry(models.Model):
     product = models.ForeignKey(
         Product, related_name='product_entry', on_delete=models.SET_NULL, null=True, blank=True)
