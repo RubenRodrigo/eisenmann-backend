@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from client.serializers import ClientSerializer
-from product.serializers import ProductSerializer
+from product.serializers import ProductSerializer, ProductStockSerializer
 from service.models import Service, ServiceProductDetail
 from employee.serializers import EmployeeSerializer
 
@@ -10,7 +10,7 @@ from employee.serializers import EmployeeSerializer
 
 
 class ServiceProductSerializer(serializers.ModelSerializer):
-    product_detail = ProductSerializer(source='product', read_only=True)
+    product_detail = ProductStockSerializer(source='product', read_only=True)
     employee_detail = EmployeeSerializer(source='employee', read_only=True)
 
     def validate(self, data):
@@ -48,16 +48,6 @@ class ServiceProductSerializer(serializers.ModelSerializer):
             'description', instance.description)
         instance.employee = validated_data.get('employee', instance.employee)
 
-        """
-        If:
-            1. Validar si son el mismo producto
-            2. Actualiza el valor del stock del product segun la cantidad
-        Else:
-            1. Validar si no son el mismo producto
-            2. Actualiza el valor del stock del product actual
-            2. Actualiza el valor del stock del nuevo product
-        """
-
         if instance.product == validated_data['product']:
             product = instance.product
             product_entry = product.product_entry.latest('created_at')
@@ -65,34 +55,6 @@ class ServiceProductSerializer(serializers.ModelSerializer):
             product_entry.stock += quantity
             product_entry.save()
             instance.product = validated_data.get('product', instance.product)
-        # else:
-        #     current_product = instance.product
-        #     sub_product = current_product.sub_product.latest('created_at')
-        #     sub_product.stock += instance.quantity
-        #     sub_product.save()
-
-        #     new_product = validated_data['product']
-        #     # new_product.stock -= quantity
-        #     # new_product.save()
-
-        #     new_sub_products = new_product.sub_product.all().order_by('created_at')
-        #     quantity = validated_data['quantity']
-
-        #     new_stock = quantity
-
-        #     for new_sub_product in new_sub_products:
-        #         new_stock = new_stock - new_sub_product.stock
-        #         if new_stock > 0:
-        #             new_sub_product.stock = 0
-        #             new_sub_product.save()
-        #         elif new_stock == 0:
-        #             new_sub_product.stock = 0
-        #             new_sub_product.save()
-        #             break
-        #         else:
-        #             new_sub_product.stock = -new_stock
-        #             new_sub_product.save()
-        #             break
 
         instance.quantity = validated_data.get('quantity', instance.quantity)
         instance.save()
@@ -113,18 +75,22 @@ class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service
         fields = [
+            # Create or Update Fields
             'id',
             'client',
             'code',
             'estimated_price',
-            'final_price',
             'init_date',
             'end_date',
             'observations',
             'name',
             'state',
-            'client_detail',
+            # Read only fields
+            # Nested Fields
             'service_products',
+            'client_detail',
+            # Attribute Fields
+            'final_price',
         ]
 
     def get_service_products(self, instance):

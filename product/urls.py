@@ -2,9 +2,21 @@ from django.conf.urls import url
 
 from . import views
 urlpatterns = [
+    # List or Detail of the product
     url(r'^$', views.ListProducts.as_view(), name='list_products'),
     url(r'^(?P<pk>[0-9]+)/$', views.DetailProduct.as_view(),
         name='detail_product'),
+
+    # List or Detail of the product stock
+    url(r'^product_stock/$', views.ListProductStock.as_view(),
+        name='list_product_stock'),
+    url(r'^product_stock/(?P<pk>[0-9]+)/$',
+        views.DetailProductStock.as_view(), name='detail_product_stock'),
+
+    # Real stock of the product
+    url(r'^product_stock_real/$', views.ListProductStockReal.as_view()),
+    url(r'^product_stock_real/(?P<pk>[0-9]+)/$',
+        views.ProductStockReal.as_view()),
 
     url(r'^product_entry/$', views.ListProductEntries.as_view(),
         name='list_product_entries'),

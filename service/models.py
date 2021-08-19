@@ -5,7 +5,7 @@ from django.utils import timezone
 
 # Create your models here.
 from client.models import Client
-from product.models import Product
+from product.models import Product, ProductStock
 
 
 # Este modelo guarda el Servicio.
@@ -37,33 +37,12 @@ class Service(models.Model):
         return total
 
 
-'''
-    @property
-    def get_total_sub(self):
-        service_products = self.serviciodetalleproducto_set.all()
-        total = sum([item.get_total for item in service_products])
-        return total
-'''
-
-'''
-class ServicioDetalleSubservicio(models.Model):
-    servicio = models.ForeignKey(Servicio, on_delete=models.SET_NULL, null=True, blank=True)
-    nombre_subservicio = models.CharField(max_length=128, null=True, blank=True)
-    costo = models.IntegerField(default=0, null=True, blank=True)
-    observaciones = models.CharField(max_length=32, null=True, blank=True)
-
-    def __str__(self):
-        return self.nombre_subservicio
-
-'''
-
-
 # Este modelo guarda los productos que se guardan en un servicio
 class ServiceProductDetail(models.Model):
     service = models.ForeignKey(
         Service, related_name='service_products', on_delete=models.CASCADE, null=True, blank=True)
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, null=True, blank=True)
+        ProductStock, on_delete=models.CASCADE, null=True, blank=True)
     employee = models.ForeignKey(
         Employee, on_delete=models.SET_NULL, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
