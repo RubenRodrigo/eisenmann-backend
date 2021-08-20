@@ -42,13 +42,14 @@ class Product(models.Model):
     @property
     def total_stock(self):
         product_stock = self.product_stock.all()
-        total = sum([item.real_stock for item in product_stock])
+        total = sum([item.total_stock_entries for item in product_stock])
         return total
 
     @property
-    def current_price(self):
-        product_entry = self.product_entry.latest('created_at')
-        return product_entry.unit_price
+    def total_price(self):
+        product_stock = self.product_stock.all()
+        total = sum([item.total_stock_price for item in product_stock])
+        return total
 
 
 class ProductStock(models.Model):
@@ -64,21 +65,13 @@ class ProductStock(models.Model):
         return str(self.product) + self.created_at.strftime('%m/%d/%Y, %H:%M:%S')
 
     # Get current total stock of object ProductStock
-    # Total stock is the sum of every stock in ProductEntry
+    # Total stock is the stock sum of every ProductEntry
+    # The value of this property change if ProductEntry change
     @property
     def total_stock(self):
         product_entries = self.product_entry.all()
         total = sum([item.stock for item in product_entries])
         return total
-
-    @property
-    def difference_stock(self):
-        return self.total_stock - self.real_stock
-
-    @property
-    def current_price(self):
-        product_entry = self.product_entry.latest('created_at')
-        return product_entry.unit_price
 
     # Get total stock that has been recorded throughout the month
     @property
@@ -86,6 +79,25 @@ class ProductStock(models.Model):
         product_entries = self.product_entry.all()
         total = sum([item.init_stock for item in product_entries])
         return total
+
+    # Get total stock price that has been recorded throughout the month
+    @property
+    def total_stock_price(self):
+        product_entries = self.product_entry.all()
+        total = sum([item.total_cost for item in product_entries])
+        return total
+
+    # Get difference between total_stock and real_stock.
+    @property
+    def difference_stock(self):
+        return self.total_stock - self.real_stock
+
+    # Get current price of object ProductStock
+    # This the price of the last ProductEntry added
+    @property
+    def current_price(self):
+        product_entry = self.product_entry.latest('created_at')
+        return product_entry.unit_price
 
     def clean(self):
         today = datetime.today()
@@ -117,6 +129,8 @@ class ProductEntry(models.Model):
     def __str__(self):
         return self.created_at.strftime('%m/%d/%Y, %H:%M:%S')
 
+    # Total cost of this entry.
+    # is how much money has been spent on this entry
     @property
     def total_cost(self):
         return self.unit_price * self.init_stock

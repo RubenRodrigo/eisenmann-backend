@@ -49,9 +49,65 @@ class ProductSerializer(serializers.ModelSerializer):
 
             # Attribute Fields
             'total_stock',
+            'total_price',
+
+            # 'product_entry',
+            'type_detail',
+            'unit_detail'
+        ]
+
+
+class ProductStockSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductStock
+        fields = [
+            # Create or Update Fields
+            'id',
+            'product',
+            'init_stock',
+            'real_stock',
+            'state',
+
+            # Read only fields
+            'created_at',
+            'updated_at',
+
+            # Attribute Fields
+            'total_stock',
+            'total_stock_entries',
+            'total_stock_price',
+            'difference_stock',
             'current_price',
+        ]
+
+
+class ProductDetailedSerializer(serializers.ModelSerializer):
+
+    type_detail = TypeSerializer(source='type', read_only=True)
+    unit_detail = UnitSerializer(source='unit', read_only=True)
+    product_stock = ProductStockSimpleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            # Create or Update Fields
+            'id',
+            'type',
+            'unit',
+            'code',
+            'name',
+            'description',
+
+            # Read only Fields
+            'created_at',
+            'updated_at',
+
+            # Attribute Fields
+            'total_stock',
+            'total_price',
 
             # Nested Fields
+            'product_stock',
             # 'product_entry',
             'type_detail',
             'unit_detail'
@@ -82,6 +138,8 @@ class ProductStockSerializer(serializers.ModelSerializer):
 
             # Attribute Fields
             'total_stock',
+            'total_stock_entries',
+            'total_stock_price',
             'difference_stock',
             'current_price',
         ]

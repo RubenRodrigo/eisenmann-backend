@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from product.models import Product, ProductEntry, ProductStock, Type, Unit
-from product.serializers import ProductSerializer, ProductEntrySerializer, ProductStockRealSerializer, ProductStockSerializer, TypeSerializer, UnitSerializer
+from product.serializers import ProductDetailedSerializer, ProductSerializer, ProductEntrySerializer, ProductStockRealSerializer, ProductStockSerializer, TypeSerializer, UnitSerializer
 
 
 class ListProducts(APIView):
@@ -43,7 +43,7 @@ class DetailProduct(APIView):
 
     def get(self, request, pk, format=None):
         product = self.get_object(pk=pk)
-        serializer = ProductSerializer(product)
+        serializer = ProductDetailedSerializer(product)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):

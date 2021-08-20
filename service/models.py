@@ -11,7 +11,7 @@ from product.models import Product, ProductStock
 # Este modelo guarda el Servicio.
 class Service(models.Model):
     client = models.ForeignKey(
-        Client, on_delete=models.SET_NULL, null=True, blank=True)
+        Client, related_name='client_services', on_delete=models.SET_NULL, null=True, blank=True)
     code = models.CharField(max_length=8, null=True, blank=True)
     estimated_price = models.CharField(max_length=128, null=True, blank=True)
     init_date = models.DateField(null=True, blank=True)

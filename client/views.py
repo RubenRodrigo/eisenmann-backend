@@ -16,7 +16,7 @@ class ListClients(APIView):
     """
 
     def get(self, request):
-        clients = Client.objects.all()
+        clients = Client.objects.all().order_by('-id')
         serializer = ClientSerializer(clients, many=True)
         return Response(serializer.data)
 
