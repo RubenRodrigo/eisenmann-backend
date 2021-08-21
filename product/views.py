@@ -88,6 +88,25 @@ class ListProductStock(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ListProductStockOrder(APIView):
+    """
+    list all product_stock, or create a new product_stock.
+    """
+
+    def get(self, request):
+        year = request.query_params.get('year')
+        month = request.query_params.get('month')
+        if year is None or month is None:
+            today = datetime.datetime.now()
+            year = today.year
+            month = today.month
+
+        product_stock = ProductStock.objects.filter(
+            created_at__year=year, created_at__month=month).order_by('stock_total')
+        serializer = ProductStockSerializer(product_stock, many=True)
+        return Response(serializer.data)
+
+
 class DetailProductStock(APIView):
     """
     detail of one product_stock.

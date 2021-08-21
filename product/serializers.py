@@ -67,6 +67,8 @@ class ProductStockSimpleSerializer(serializers.ModelSerializer):
             'init_stock',
             'real_stock',
             'state',
+            'medium_value',
+            'minium_value',
 
             # Read only fields
             'created_at',
@@ -127,6 +129,9 @@ class ProductStockSerializer(serializers.ModelSerializer):
             'init_stock',
             'real_stock',
             'state',
+            'medium_value',
+            'minium_value',
+            'stock_total',
 
             # Read only fields
             'created_at',

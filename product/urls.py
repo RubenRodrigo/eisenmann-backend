@@ -13,6 +13,8 @@ urlpatterns = [
     url(r'^product_stock/(?P<pk>[0-9]+)/$',
         views.DetailProductStock.as_view(), name='detail_product_stock'),
 
+    url(r'^product_stock_order/$', views.ListProductStockOrder.as_view()),
+
     # Real stock of the product
     url(r'^product_stock_real/$', views.ListProductStockReal.as_view()),
     url(r'^product_stock_real/(?P<pk>[0-9]+)/$',
