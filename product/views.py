@@ -242,6 +242,36 @@ class ListTypes(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class DetailType(APIView):
+    """
+    detail of one Type.
+    """
+
+    @staticmethod
+    def get_object(pk):
+        try:
+            return Type.objects.get(pk=pk)
+        except ProductEntry.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        type = self.get_object(pk=pk)
+        serializer = TypeSerializer(type)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        type = self.get_object(pk)
+        serializer = TypeSerializer(type, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        type = self.get_object(pk)
+        type.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 class ListUnits(APIView):
     """
     list all units, or create a new units.
@@ -258,3 +288,33 @@ class ListUnits(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DetailUnit(APIView):
+    """
+    detail of one unit.
+    """
+
+    @staticmethod
+    def get_object(pk):
+        try:
+            return Unit.objects.get(pk=pk)
+        except Unit.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        unit = self.get_object(pk=pk)
+        serializer = UnitSerializer(unit)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        unit = self.get_object(pk)
+        serializer = UnitSerializer(unit, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        unit = self.get_object(pk)
+        unit.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -26,5 +26,8 @@ urlpatterns = [
         views.DetailProductEntry.as_view(), name='detail_product_entry'),
 
     url(r'^type/$', views.ListTypes.as_view(), name='list_types'),
+    url(r'^type/(?P<pk>[0-9]+)/$', views.DetailType.as_view()),
+
     url(r'^unit/$', views.ListUnits.as_view(), name='list_units'),
+    url(r'^unit/(?P<pk>[0-9]+)/$', views.DetailUnit.as_view()),
 ]
